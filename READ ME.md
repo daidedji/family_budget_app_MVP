@@ -1,45 +1,47 @@
-# 🏦 Family Budgeting App (Django MVP)
+# Family Budgeting App (Django MVP)
 
-A simple one-page budgeting web app built with Django + SQLite.
-
-## Features
-- 50/30/20 Budget Calculator  
-- Manage Funds (Money In / Out)  
-- Track Debts & Bills  
-- Add Family Members  
-- Simulated Chatbot  
-
-# 🏦 Family Budgeting App (Django MVP)
-
-A simple one-page web app built with **Python**, **Django**, and **SQLite** that helps families track funds, budgets, debts, and bills using the 50/30/20 rule.
+A simple multi-page web app built with Python, Django, and SQLite that helps families track funds, income, and expenses using the 50/30/20 budgeting rule.
 
 ---
 
-## 🚀 How to Run the App
+## Features
+- 50/30/20 budget breakdown  
+- Add and track income  
+- Add and track expenses  
+- View monthly summary and balance  
+- Simulated family login (no authentication required)  
+- Minimal Bootstrap UI design  
 
-1. **Clone the repo**
-   ```bash
-   git clone https://github.com/<yourusername>/family_budget_app.git
-   cd family_budget_app
-# 🏦 Family Budgeting App (Django MVP)
+---
+
+## How to Run the App
+
+### 1. Clone the repository
+```bash
+git clone https://github.com/Daidedji/family_budget_app.git
+cd family_budget_app
+
+```
+#Family Budgeting App (Django MVP) 
 
 #For Windows 
-python -m venv .venv
-.venv\Scripts\activate
+python -m venv 
+.venv .venv\Scripts\activate 
 
 #For Mac 
-python3 -m venv .venv
-source .venv/bin/activate
+python3 -m venv .venv 
+source .venv/bin/activate 
 
-pip install django
+pip install django 
 
 python manage.py makemigrations
-python manage.py migrate
 
-python manage.py runserver
+python manage.py migrate 
 
+python manage.py runserver 
 
 And then open this link and you will be on the website I made so far Tell me what you think.
 
+http://127.0.0.1:8000/
 
-D
+Derrick

@@ -1,67 +1,77 @@
 from django.shortcuts import render, redirect
-from .models import User, Funds, Debt, Transaction, Budget, Bill
-from .forms import TransactionForm, DebtForm, BillForm, UserForm
+from .models import Income, Expense
 
-def index(request):
-    funds, _ = Funds.objects.get_or_create(id=1)
-    debt, _ = Debt.objects.get_or_create(id=1)
-    budget, _ = Budget.objects.get_or_create(id=1)
+# Simulated login (stores name in session)
+def login_view(request):
+    if request.method == "POST":
+        username = request.POST.get("username")
+        if username:
+            request.session['username'] = username
+            return redirect('dashboard')
+    return render(request, "login.html")
 
-    # Calculate 50/30/20
-    budget.needs = funds.total * 0.5
-    budget.wants = funds.total * 0.3
-    budget.savings = funds.total * 0.2
-    budget.save()
+def dashboard_view(request):
+    username = request.session.get('username', None)
+    if not username:
+        return redirect('login')
 
-    chat_output = ""
-
-    # Handle POST requests
-    if request.method == 'POST':
-        if 'transaction_submit' in request.POST:
-            form = TransactionForm(request.POST)
-            if form.is_valid():
-                t = form.save()
-                if t.type == 'IN':
-                    funds.total += t.amount
-                else:
-                    funds.total -= t.amount
-                funds.save()
-                return redirect('index')
-
-        elif 'debt_submit' in request.POST:
-            dform = DebtForm(request.POST, instance=debt)
-            if dform.is_valid():
-                dform.save()
-                return redirect('index')
-
-        elif 'bill_submit' in request.POST:
-            bform = BillForm(request.POST)
-            if bform.is_valid():
-                bform.save()
-                return redirect('index')
-
-        elif 'user_submit' in request.POST:
-            uform = UserForm(request.POST)
-            if uform.is_valid():
-                uform.save()
-                return redirect('index')
-
-        elif 'chat_submit' in request.POST:
-            chat_input = request.POST.get('chat_input', '')
-            chat_output = f"You said: '{chat_input}'. AI CHAT BOT WORK IN PROGRESS IF IT TAKES TOO LONG MAY CUT :/"
+    total_income = sum(i.amount for i in Income.objects.all())
+    total_expense = sum(e.amount for e in Expense.objects.all())
+    balance = total_income - total_expense
 
     context = {
-        'funds': funds,
-        'debt': debt,
-        'budget': budget,
-        'transactions': Transaction.objects.all().order_by('-date'),
-        'bills': Bill.objects.all().order_by('due_date'),
-        'users': User.objects.all(),
-        'form': TransactionForm(),
-        'dform': DebtForm(instance=debt),
-        'bform': BillForm(),
-        'uform': UserForm(),
-        'chat_output': chat_output,
+        "username": username,
+        "total_income": total_income,
+        "total_expense": total_expense,
+        "balance": balance,
     }
+    return render(request, "dashboard.html", context)
 
-    return render(request, 'index.html', context)
+def add_income_view(request):
+    username = request.session.get('username', None)
+    if not username:
+        return redirect('login')
+
+    if request.method == "POST":
+        source = request.POST.get("source")
+        amount = request.POST.get("amount")
+        if source and amount:
+            Income.objects.create(source=source, amount=float(amount))
+            return redirect('dashboard')
+
+    return render(request, "add_income.html", {"username": username})
+
+def add_expense_view(request):
+    username = request.session.get('username', None)
+    if not username:
+        return redirect('login')
+
+    if request.method == "POST":
+        category = request.POST.get("category")
+        amount = request.POST.get("amount")
+        if category and amount:
+            Expense.objects.create(category=category, amount=float(amount))
+            return redirect('dashboard')
+
+    return render(request, "add_expense.html", {"username": username})
+
+def summary_view(request):
+    username = request.session.get('username', None)
+    if not username:
+        return redirect('login')
+
+    incomes = Income.objects.all()
+    expenses = Expense.objects.all()
+    total_income = sum(i.amount for i in incomes)
+    total_expense = sum(e.amount for e in expenses)
+    balance = total_income - total_expense
+
+    context = {
+        "username": username,
+        "incomes": incomes,
+        "expenses": expenses,
+        "total_income": total_income,
+        "total_expense": total_expense,
+        "balance": balance,
+    }
+    return render(request, "summary.html", context)
