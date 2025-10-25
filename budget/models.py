@@ -1,23 +1,19 @@
 from django.db import models
+from django.utils import timezone
 
-class FamilyMember(models.Model):
-    name = models.CharField(max_length=100)
-    role = models.CharField(max_length=100)
-
-    def __str__(self):
-        return f"{self.name} ({self.role})"
-
-class Transaction(models.Model):
-    TYPE_CHOICES = [
-        ('IN', 'Money In'),
-        ('OUT', 'Money Out'),
-    ]
-
-    family_member = models.ForeignKey(FamilyMember, on_delete=models.CASCADE)
-    type = models.CharField(max_length=3, choices=TYPE_CHOICES)
-    amount = models.DecimalField(max_digits=10, decimal_places=2)
-    description = models.CharField(max_length=200, blank=True, null=True)
-    date = models.DateTimeField(auto_now_add=True)
+class Income(models.Model):
+    source = models.CharField(max_length=100)
+    amount = models.FloatField()
+    date_added = models.DateTimeField(default=timezone.now)
 
     def __str__(self):
-        return f"{self.family_member.name} - {self.type} ${self.amount}"
+        return f"{self.source} - ${self.amount:.2f}"
+
+
+class Expense(models.Model):
+    category = models.CharField(max_length=100)   # ← this field was missing
+    amount = models.FloatField()
+    date_added = models.DateTimeField(default=timezone.now)
+
+    def __str__(self):
+        return f"{self.category} - ${self.amount:.2f}"
